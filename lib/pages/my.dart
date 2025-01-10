@@ -69,9 +69,9 @@ class MyPage extends StatelessWidget {
                 '나의 정보',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10.0),
+              SizedBox(height: 16.0),
               Container(
-                padding: EdgeInsets.all(15.0),
+                padding: EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10.0),
@@ -82,18 +82,18 @@ class MyPage extends StatelessWidget {
                     Row(
                       children: [
                         Icon(Icons.directions_walk, color: Colors.grey),
-                        SizedBox(width: 10.0),
+                        SizedBox(width: 15.0), // 간격 조정
                         Text(
                           '오늘 걸은 걸음수',
                           style: TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
-                    SizedBox(height: 10.0),
+                    SizedBox(height: 15.0), // 간격 추가
                     Row(
                       children: [
                         Icon(Icons.height, color: Colors.grey),
-                        SizedBox(width: 10.0),
+                        SizedBox(width: 15.0), // 간격 조정
                         Text(
                           '키 155 / 몸무게 48',
                           style: TextStyle(fontSize: 16),
@@ -103,6 +103,7 @@ class MyPage extends StatelessWidget {
                   ],
                 ),
               ),
+
               SizedBox(height: 20.0),
               // 나의 활동 섹션
               Text(
@@ -132,7 +133,7 @@ class MyPage extends StatelessWidget {
               ),
               SizedBox(height: 10.0),
               Container(
-                padding: EdgeInsets.all(15.0),
+                padding: EdgeInsets.all(7.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10.0),

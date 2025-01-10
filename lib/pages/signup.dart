@@ -56,15 +56,16 @@ class SignUpPage extends StatelessWidget {
   void _showMessage(BuildContext context, String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('확인'),
+      builder: (context) =>
+          AlertDialog(
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('확인'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -89,29 +90,30 @@ class SignUpPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 33.0, vertical: 30.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTextField('이름 *', _nameController),
-              SizedBox(height: 16),
-              _buildTextField('아이디 *', _idController),
-              SizedBox(height: 16),
-              _buildTextField('비밀번호 *', _passwordController, obscureText: true),
-              SizedBox(height: 16),
-              _buildTextField('비밀번호 확인 *', _confirmPasswordController,
+              _buildTextField('이름', _nameController),
+              SizedBox(height: 14),
+              _buildTextField('아이디', _idController),
+              SizedBox(height: 14),
+              _buildTextField('비밀번호', _passwordController, obscureText: true),
+              SizedBox(height: 14),
+              _buildTextField('비밀번호 확인', _confirmPasswordController,
                   obscureText: true),
-              SizedBox(height: 16),
-              _buildTextField('키 (cm) *', _heightController),
-              SizedBox(height: 16),
-              _buildTextField('몸무게 (kg) *', _weightController),
-              SizedBox(height: 32),
+              SizedBox(height: 14),
+              _buildTextField('키 (cm)', _heightController),
+              SizedBox(height: 14),
+              _buildTextField('몸무게 (kg)', _weightController),
+              SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
                   onPressed: () => _signUp(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFFFDCDC), // 분홍색 버튼 배경
-                    minimumSize: Size(double.infinity, 50), // 버튼 크기
+                    minimumSize: Size(double.infinity, 40), // 버튼 크기 (높이 약간 줄임)
+                    padding: EdgeInsets.symmetric(horizontal: 25.0), // 버튼 패딩 추가
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -125,6 +127,7 @@ class SignUpPage extends StatelessWidget {
                   ),
                 ),
               ),
+
             ],
           ),
         ),
@@ -137,21 +140,33 @@ class SignUpPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          hint,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0), // 왼쪽 여백 추가
+          child: Text(
+            hint,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
         ),
-        SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            hintText: hint,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide.none,
+        SizedBox(height: 5),
+        Container(
+          height: 50, // 입력 필드 전체 높이
+          child: TextField(
+            controller: controller,
+            obscureText: obscureText,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: 14, vertical: 8),
+              // 텍스트 내부 여백
+              filled: true,
+              fillColor: Colors.white,
+              hintText: hint,
+              hintStyle: TextStyle(
+                color: Colors.grey[350], // 힌트 텍스트를 회색으로 설정
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide.none,
+              ),
             ),
           ),
         ),
