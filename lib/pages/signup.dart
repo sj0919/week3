@@ -90,7 +90,7 @@ class SignUpPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 33.0, vertical: 30.0),
+          padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 30.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -144,18 +144,18 @@ class SignUpPage extends StatelessWidget {
           padding: const EdgeInsets.only(left: 8.0), // 왼쪽 여백 추가
           child: Text(
             hint,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 14),
           ),
         ),
-        SizedBox(height: 5),
+        SizedBox(height: 3),
         Container(
-          height: 50, // 입력 필드 전체 높이
+          height: 43, // 입력 필드 전체 높이
           child: TextField(
             controller: controller,
             obscureText: obscureText,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 8),
+                  horizontal: 10, vertical: 8),
               // 텍스트 내부 여백
               filled: true,
               fillColor: Colors.white,
