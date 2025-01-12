@@ -169,6 +169,7 @@ class MyProfilePage extends StatelessWidget {
                   ],
                 ),
               ),
+              SizedBox(height: 10.0),
             ],
           ),
         ),

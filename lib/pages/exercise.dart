@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:week3/pages/PoseTrackerPage.dart';
 class ExercisePage extends StatefulWidget {
   @override
   _ExercisePageState createState() => _ExercisePageState();
@@ -9,6 +9,7 @@ class _ExercisePageState extends State<ExercisePage> {
   String name = "승진";
   bool isPastRoutine = true; // 토글 상태를 저장
   String selectedLevel = "중"; // 선택된 운동 강도
+  List<String> selectedExercises = []; // 선택된 운동 리스트
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,7 @@ class _ExercisePageState extends State<ExercisePage> {
         ),
         automaticallyImplyLeading: false,
       ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -150,7 +152,6 @@ class _ExercisePageState extends State<ExercisePage> {
   }
 
   // 새 루틴 만들기 UI
-// 새 루틴 만들기 UI
   Widget _buildNewRoutine() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,6 +192,11 @@ class _ExercisePageState extends State<ExercisePage> {
             _buildStyledTag("런지", Color(0xC5E09D)),
             _buildStyledTag("플랭크", Color(0xA6AEF7)),
           ],
+        ),
+        SizedBox(height: 20),
+        Text(
+          "선택한 운동: ${selectedExercises.join(', ')}",
+          style: TextStyle(fontSize: 14, color: Colors.black),
         ),
         SizedBox(height: 30),
         Text(
@@ -233,12 +239,14 @@ class _ExercisePageState extends State<ExercisePage> {
           alignment: Alignment.center, // 버튼을 중앙에 배치
           child: ElevatedButton(
             onPressed: () {
-              // 루틴 생성 로직 추가
-              print("루틴 생성 버튼 클릭됨");
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RecommendationPage()),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFFFFE0E0), // 버튼 배경색
-              foregroundColor: Colors.white, // 텍스트 및 아이콘 색상
+              foregroundColor: Colors.black, // 텍스트 및 아이콘 색상
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24), // 버튼 모서리 둥글게
               ),
@@ -340,19 +348,200 @@ class _ExercisePageState extends State<ExercisePage> {
   }
 
   Widget _buildStyledTag(String label, Color color) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 3), // 패딩 추가
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2), // 배경색 투명도 조정
-        border: Border.all(color: color.withOpacity(1), width: 1.5), // 테두리 스타일
-        borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+    final isSelected = selectedExercises.contains(label);
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            selectedExercises.remove(label);
+          } else {
+            selectedExercises.add(label);
+          }
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 3), // 패딩 추가
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.5) : color.withOpacity(0.2), // 선택 여부에 따른 배경색
+          border: Border.all(color: color.withOpacity(1), width: 1.5), // 테두리 스타일
+          borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: Colors.black, // 텍스트 색상
+            fontWeight: FontWeight.bold, // 텍스트 굵게
+            fontSize: 14, // 텍스트 크기
+          ),
+        ),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: Colors.black, // 텍스트 색상
-          fontWeight: FontWeight.bold, // 텍스트 굵게
-          fontSize: 14, // 텍스트 크기
+    );
+  }
+}
+
+class RecommendationPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("운동 추천"),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+        automaticallyImplyLeading: false,
+      ),
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 20),
+            Text(
+              "00님에게 맞는 운동 추천",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 40),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: [
+                  _buildExerciseTile(
+                    imagePath: 'assets/pushup.png',
+                    title: '푸쉬업',
+                    count: '0회',
+                    height: 35,
+                    width: 110,
+                  ),
+                  _buildExerciseTile(
+                    imagePath: 'assets/squat.png',
+                    title: '스쿼트',
+                    count: '0회',
+                    height: 100,
+                    width: 50,
+                  ),
+                  _buildExerciseTile(
+                    imagePath: 'assets/lunge.png',
+                    title: '런지',
+                    count: '0회',
+                    height: 100,
+                    width: 70,
+                  ),
+                  _buildExerciseTile(
+                    imagePath: 'assets/plank.png',
+                    title: '플랭크',
+                    count: '0회',
+                    height: 60,
+                    width: 120,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PoseTrackerPage(title: 'PoseTracker Demo'),),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFFFE0E0),
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                minimumSize: Size(150, 40),
+              ),
+              child: Text(
+                "운동 하러가기",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExerciseTile({required String imagePath, required String title, required String count, required double height, required double width}) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset(
+          imagePath,
+          height: height,
+          width: width,
+          fit: BoxFit.cover,
+        ),
+        SizedBox(height: 8),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          count,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class WorkoutScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("운동 시작"),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+        automaticallyImplyLeading: true,
+      ),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 20),
+            Text(
+              "앉았다 일어나세요. 지금 당장!",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
