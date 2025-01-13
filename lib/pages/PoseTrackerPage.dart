@@ -23,8 +23,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'PoseTracker Demo',
       theme: ThemeData(
+        // primarySwatch: Colors.blue,
         primaryColor: const Color(0xFF000000),
         secondaryHeaderColor: const Color(0xFF000000),
+        // colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.white),
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
@@ -43,18 +45,25 @@ class PoseTrackerPage extends StatefulWidget {
 }
 
 class _PoseTrackerPageState extends State<PoseTrackerPage> {
-  // Constants
-  final String API_KEY = "75d3c7f5-0533-429c-a137-2ae8a47dd10c";
-  final String POSETRACKER_API_URL = "https://app.posetracker.com/pose_tracker/tracking";
-  final String exercise = "squat";
-  final String difficulty = "easy";
-  final bool skeleton = true;
-  final int width = 350;
-  final int height = 350;
-  final int counter = 0; // Counter for exercise repetitions
-  int _totalCount = 0; // Total count of repetitions
 
-  // States
+  // Constants
+  // API request your token provided on our dashboard on posetracker.com (It's free <3)
+  final String API_KEY = "75d3c7f5-0533-429c-a137-2ae8a47dd10c";
+  // Below is the main url to reach our API
+  final String POSETRACKER_API_URL = "https://app.posetracker.com/pose_tracker/tracking";
+  // Our API request the exercise you want to track and count
+  final String exercise = "squat";
+  // Our API request the difficulty of the exercise (by default it's set to normal)
+  final String difficulty = "easy";
+  // You can request API to display user skeleton or not (by default it's set to true)
+  final bool skeleton = true;
+  // retrieve webview dimensions
+  final int width = 350;
+  // webView.resources.displayMetrics.
+  final int height = 450;
+
+
+  // states
   String _displayText = "";
   String _api_url = "";
 
@@ -66,26 +75,26 @@ class _PoseTrackerPageState extends State<PoseTrackerPage> {
   void initState() {
     super.initState();
 
-    // Initialize URL and text
-    _api_url = "$POSETRACKER_API_URL?token=$API_KEY&exercise=$exercise&difficulty=$difficulty&type=$_totalCount&skeleton=$skeleton&width=$width&height=$height";
+    // init url and text
+    _api_url = "$POSETRACKER_API_URL?token=$API_KEY&exercise=$exercise&difficulty=$difficulty&skeleton=$skeleton&width=$width&height=$height";
     _displayText = "Waiting for API Data...";
-    _requestCameraPermission();
 
-    // Configure JS in WebView depending on platform
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) { // iOS
+    // configure JS in webview depending on platform
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) { // ios
+      // configure specific params here
       params = WebKitWebViewControllerCreationParams(
         allowsInlineMediaPlayback: true,
         mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
       );
-    } else { // Android
+    } else { // android
       params = const PlatformWebViewControllerCreationParams();
     }
 
-    // Initialize WebController
+    // init common webcontroller
     _webviewController = WebViewController.fromPlatformCreationParams(params);
 
-    // Configure specific params for Android
-    if (_webviewController.platform is AndroidWebViewController) {
+    // configure specific params for android here
+    if(_webviewController.platform is AndroidWebViewController) {
       AndroidWebViewController.enableDebugging(true);
       AndroidWebViewController ctrler = (_webviewController.platform as AndroidWebViewController);
       ctrler.setMediaPlaybackRequiresUserGesture(false);
@@ -95,71 +104,36 @@ class _PoseTrackerPageState extends State<PoseTrackerPage> {
       });
     }
 
-    // Add JavaScript Bridge
+    // add JsBridge
     _webviewController.addJavaScriptChannel(
-      "flutterJsMessageBridge",
-      onMessageReceived: (JavaScriptMessage javaScriptMessage) {
-        setState(() {
-          // Parse the message from WebView (assume it sends the repetition count)
-          try {
-            final parsedData = int.parse(javaScriptMessage.message);
-            _totalCount = parsedData;
-            _displayText = "횟수: $_totalCount";
-          } catch (e) {
-            _displayText = "Error parsing data: ${javaScriptMessage.message}";
-          }
-        });
-      },
-    );
-
-    // Set navigation delegate for WebView
-    _webviewController.setNavigationDelegate(
-      NavigationDelegate(
-        onPageStarted: (String url) {
-          setState(() {
-            _displayText = "Loading...";
-          });
-        },
-        onPageFinished: (String url) {
-          setState(() {
-            _displayText = "Page Loaded";
-          });
-          _webviewController.runJavaScript("""
-            javascript:(function() {
-              let squatCount = 0;
-
-              // PoseTracker에서 스쿼트 동작 감지 이벤트 연결
-              if (window.poseTracker && typeof window.poseTracker.on === 'function') {
-                window.poseTracker.on('squatDetected', function() {
-                  squatCount++;
-                  flutterJsMessageBridge.postMessage(squatCount.toString());
-                });
-              } else {
-                console.error('PoseTracker API가 로드되지 않았습니다.');
-              }
-            })();
-          """);
-        },
-      ),
-    );
-  }
-
-  void _requestCameraPermission() async {
-    var status = await Permission.camera.request();
-
-    if (status.isGranted) {
-      print("Camera permission granted");
-      _initializeWebView();
-    } else {
-      print("Camera permission denied");
+        "flutterJsMessageBridge", onMessageReceived: (JavaScriptMessage javaScriptMessage) {
       setState(() {
-        _displayText = "Camera access denied. Please allow permissions in settings.";
+        _displayText = javaScriptMessage.message;
       });
-    }
-  }
+    });
+    _webviewController.setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (String url) {
+            setState(() {
+              _displayText = "Waiting for API data...";
+            });
+          },
+          onPageFinished: (String url) {
+            setState(() {
+              _webviewController.runJavaScript("""
+              javascript:(function() {
+                window.webViewCallback = function(info) {
+                  flutterJsMessageBridge.postMessage(JSON.stringify(info ? info : 'No data'));
+                }
+              })();
+            """);
+            });
+          },
+        ));
 
-  void _initializeWebView() {
-    _webviewController.loadRequest(Uri.parse(_api_url));
+    // request camera permision then start url
+    Permission.camera.request()
+        .whenComplete( () => _webviewController.loadRequest(Uri.parse(_api_url)));
   }
 
   @override
@@ -172,59 +146,45 @@ class _PoseTrackerPageState extends State<PoseTrackerPage> {
       ),
       body: Center(
         child: Column(
-          children: [
-            // WebView
-            Expanded(
-              flex: 3,
-              child: WebViewWidget(controller: _webviewController),
-            ),
-            // Status and Count Display
-            Expanded(
-              flex: 2,
-              child: Container(
-                padding: const EdgeInsets.all(5.0),
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "횟수:",
-                      style: widget.textMsgStyle.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      "$_totalCount",
-                      style: widget.textMsgStyle.copyWith(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.blue),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      _displayText, // JS data from API or status message
-                      style: widget.textMsgStyle,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+            children: [
+              // ===== Webview =====
+              Expanded(
+                flex: 3,
+                child:  WebViewWidget(controller: _webviewController),
               ),
-            ),
-            // Refresh Button
-            Expanded(
-              flex: 0,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  textStyle: widget.textMsgStyle,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _displayText = "Reloading...";
-                  });
-                  _webviewController.loadRequest(Uri.parse(_api_url));
-                },
-                child: const Text(
-                  "Refresh",
-                  style: TextStyle(color: Colors.black),
-                ),
+              // ===== Text Status =====
+              Expanded(
+                  flex: 2,
+                  child: Container(
+                      padding: const EdgeInsets.all(5.0),
+                      width: MediaQuery.of(context).size.width*0.8,
+                      child: Wrap (
+                          children: [
+                            Text("Data: ", style : widget.textMsgStyle),
+                            Text(_displayText, // js data from api OR status message
+                                style: widget.textMsgStyle)
+                          ]
+                      )
+                  )
               ),
-            ),
-          ],
+              // ===== Button area =====
+              Expanded(
+                  flex: 0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        textStyle: widget.textMsgStyle
+                    ),
+                    onPressed: () { // reload page on press
+                      setState(() {
+                        _displayText = "Reloading ! ";
+                      });
+                      _webviewController.loadRequest(Uri.parse(_api_url));
+                    },
+                    child: const Text("Refresh", style: TextStyle(color: Colors.black)),
+                  )
+              )
+            ]
+
         ),
       ),
     );

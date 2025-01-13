@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:week3/pages/PoseTrackerPage.dart';
+
 class ExercisePage extends StatefulWidget {
   @override
   _ExercisePageState createState() => _ExercisePageState();
@@ -187,10 +188,10 @@ class _ExercisePageState extends State<ExercisePage> {
           spacing: 12, // 버튼 간 간격 조정
           runSpacing: 12,
           children: [
-            _buildStyledTag("푸쉬업", Color(0xFFF08E)),
-            _buildStyledTag("스쿼트", Color(0xF7BBBB)),
-            _buildStyledTag("런지", Color(0xC5E09D)),
-            _buildStyledTag("플랭크", Color(0xA6AEF7)),
+            _buildStyledTag("pushup", Color(0xFFF08E)),
+            _buildStyledTag("squat", Color(0xF7BBBB)),
+            _buildStyledTag("lunge", Color(0xC5E09D)),
+            _buildStyledTag("plank", Color(0xA6AEF7)),
           ],
         ),
         SizedBox(height: 20),
@@ -241,7 +242,7 @@ class _ExercisePageState extends State<ExercisePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => RecommendationPage()),
+                MaterialPageRoute(builder: (context) => RecommendationPage(selectedExercises: selectedExercises, selectedLevel: selectedLevel)),
               );
             },
             style: ElevatedButton.styleFrom(
@@ -326,9 +327,9 @@ class _ExercisePageState extends State<ExercisePage> {
           ),
           Row(
             children: [
-              _buildTag("유산소", Colors.orange),
+              _buildTag("Cardio", Colors.orange),
               SizedBox(width: 5),
-              _buildTag("스쿼트", Colors.green),
+              _buildTag("Squat", Colors.green),
             ],
           ),
         ],
@@ -379,9 +380,34 @@ class _ExercisePageState extends State<ExercisePage> {
   }
 }
 
+// Update the RecommendationPage to handle dynamic recommendations
 class RecommendationPage extends StatelessWidget {
+  final List<String> selectedExercises;
+  final String selectedLevel;
+
+  RecommendationPage({required this.selectedExercises, required this.selectedLevel});
+
+  Map<String, int> _calculateRecommendations(String level) {
+    // Define base counts for each exercise based on difficulty
+    final baseCounts = {
+      'pushup': {'하': 10, '중': 20, '상': 30},
+      'squat': {'하': 15, '중': 30, '상': 45},
+      'lunge': {'하': 10, '중': 20, '상': 30},
+      'plank': {'하': 20, '중': 40, '상': 60},
+    };
+
+    // Generate recommendations based on selected level
+    Map<String, int> recommendations = {};
+    for (var exercise in selectedExercises) {
+      recommendations[exercise] = baseCounts[exercise]?[level] ?? 0;
+    }
+    return recommendations;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final recommendations = _calculateRecommendations(selectedLevel);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("운동 추천"),
@@ -393,7 +419,7 @@ class RecommendationPage extends StatelessWidget {
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
       ),
       backgroundColor: Colors.white,
       body: Padding(
@@ -403,12 +429,13 @@ class RecommendationPage extends StatelessWidget {
           children: [
             SizedBox(height: 20),
             Text(
-              "00님에게 맞는 운동 추천",
+              "${selectedLevel} 강도로 ${selectedExercises.join(', ')} 추천",
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 40),
             Expanded(
@@ -416,36 +443,18 @@ class RecommendationPage extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                children: [
-                  _buildExerciseTile(
-                    imagePath: 'assets/pushup.png',
-                    title: '푸쉬업',
-                    count: '0회',
-                    height: 35,
-                    width: 110,
-                  ),
-                  _buildExerciseTile(
-                    imagePath: 'assets/squat.png',
-                    title: '스쿼트',
-                    count: '0회',
+                children: selectedExercises.map((exercise) {
+                  return _buildExerciseTile(
+                    imagePath: 'assets/${exercise.toLowerCase()}.png',
+                    title: exercise,
+                    count: exercise.toLowerCase() == 'plank'
+                        ? '${recommendations[exercise]}분' // Display in minutes for plank
+                        : '${recommendations[exercise]}회', // Display in repetitions for others
                     height: 100,
-                    width: 50,
-                  ),
-                  _buildExerciseTile(
-                    imagePath: 'assets/lunge.png',
-                    title: '런지',
-                    count: '0회',
-                    height: 100,
-                    width: 70,
-                  ),
-                  _buildExerciseTile(
-                    imagePath: 'assets/plank.png',
-                    title: '플랭크',
-                    count: '0회',
-                    height: 60,
-                    width: 120,
-                  ),
-                ],
+                    width: 100,
+                  );
+                }).toList(),
+
               ),
             ),
             SizedBox(height: 20),
@@ -453,7 +462,8 @@ class RecommendationPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const PoseTrackerPage(title: 'PoseTracker Demo'),),
+                  MaterialPageRoute(
+                      builder: (context) => const PoseTrackerPage(title: 'PoseTracker Demo')),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -479,7 +489,13 @@ class RecommendationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildExerciseTile({required String imagePath, required String title, required String count, required double height, required double width}) {
+  Widget _buildExerciseTile({
+    required String imagePath,
+    required String title,
+    required String count,
+    required double height,
+    required double width,
+  }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -510,40 +526,3 @@ class RecommendationPage extends StatelessWidget {
   }
 }
 
-class WorkoutScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("운동 시작"),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        automaticallyImplyLeading: true,
-      ),
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            Text(
-              "앉았다 일어나세요. 지금 당장!",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
