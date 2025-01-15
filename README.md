@@ -1,16 +1,66 @@
-# week3
+## About Pink-Dumbbell…
 
-A new Flutter project.
+---
 
-## Getting Started
+### Outline
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+- PinkDumbbell 을 더 이상 무시하지 마세요! 당신이 상상한 것보다 훨씬 빡센 운동 앱, 핑크덤벨.
+- 사용자가 강도를 설정하면 핑크덤벨만의 알고리즘으로 지옥의 운동 루틴을 추천해준답니다!
+- 횟수 counting API 를 적용해서 스쿼트를 현재 몇 개까지 진행했는지 사용자를 직접 tracking 해요.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Team
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+이승진 | 이화여대 융합콘텐츠학과
+
+seungjinlee09@naver.com
+
+김문원 | 숙명여대 컴퓨터공학과
+
+angkmfirefoxygal@sookmyung.ac.kr
+
+### Tech Stack
+
+---
+
+**Front-end** : Kotlin
+
+**IDE** : Android Studio
+
+## 로그인 페이지
+
+- Kako 자동 로그인을 구현하여 사용자를 관리합니다.
+
+## Tab 1 홈 화면
+
+- 홈 화면에서 푸쉬업, 스쿼트, 런지, 플랭크 중에 선택하면 아래와 같이 동작 인식이 되고 count가 올라갑니다
+
+## Tab 2 운동 기록
+
+- 지난 운동 기록들을 볼 수 있는 화면입니다.
+- 루틴 생성 후에 해당 내용이 운동 기록으로 저장되어 tab2 에서 이를 확인할 수 있습니다.
+
+## Tab 3 루틴 생성
+
+- 사용자는 pink dumbbell의 알고리즘을 이용해서 운동 종류와 강도를 선택하여 운동을 생성할 수 있습니다.
+- 루틴은 총 4번 반복되며, 예를 들어 스쿼트, 푸시업 선택 후 강도 “중” 을 선택하면 스쿼트 30회 + 푸시업 30회 * 4번 반복 하는 루틴이 생성 됩니다.
+- 그리고 생성된 루틴대로 스쿼트 횟수 카운팅이 시작되며 사용자의 속도에 맞게 횟수가 카운팅되면 다음 루틴으로 화면이 넘어갑니다.
+
+## Tab 4 마이페이지
+
+- 마이 페이지에서는 로그아웃 및 기타 앱 관리 기능이 포함되어있습니다.
+- 또한 회원 가입 시에 기록한 키와 몸무게를 편집하여 입력할 수 있습니다.
+
+## 후기
+
+김문원 
+
+- 즐거웠다. 무엇보다 승진이와 함께해서 영광이다. 진짜 이승진이 아니었다면 이번주 김문원은 끔살..당했을지도.
+- 나를 견뎌준 승진이에게 깊은 감사와 사랑.
+
+이승진
+
+- 1주차 느낌 내봤다. 이번주는 즐겁게 쉬었던걸루~><
